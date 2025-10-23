@@ -126,23 +126,6 @@ python cli.py --data path/to/your_data.csv --mode all
 
 Outputs are written to `outputs/` (configurable in `config.py`).
 
----
-
-# Configuration
-
-Key options in `config.py`:
-
-* `DATA_TIMESTAMP_COL` — CSV timestamp column name
-* `DATA_TARGET_COL` — CSV target column name
-* `SEQ_LEN` — lookback window (default 14)
-* `HORIZON` — forecast horizon (default 1)
-* `BATCH_SIZE` — training batch size
-* `TEST_DAYS` — number of days in the test split (default 30)
-* `DEVICE` — `'cuda'` or `'cpu'` (auto-detected)
-
-Adjust hyperparameters or implement a `train_config.yaml` if you prefer a parameter-driven run.
-
----
 
 # How to add your data
 
@@ -164,76 +147,6 @@ Adjust hyperparameters or implement a `train_config.yaml` if you prefer a parame
   * **Precision, Recall, F1** (focus on Recall for early-warning)
 * Use time-series cross-validation (walk-forward) to get robust estimates.
 
----
 
-# Recommended experiments
 
-* Compare models: LSTM vs GRU vs XGBoost vs ARIMA.
-* Ablation on `SEQ_LEN` (3, 7, 14, 28) and forecast horizon (1..7).
-* Robustness tests: inject sensor noise and missing data to see how models behave.
-* Try TCN or small Transformer if you have long histories (>1k timesteps).
-* Add uncertainty: MC Dropout, quantile regression, or LightGBM quantiles.
 
----
-
-# Deployment notes (server vs edge)
-
-* **Server/cloud**: host LSTM/GRU/XGBoost behind an API (FastAPI/Flask). Server does training & heavy inference.
-* **Edge (STM32 / ESP32)**:
-
-  * Prefer simple rules (thresholds, rolling-average checks) or tiny linear models.
-  * For tree models, export shallow trees or distilled rules; for NN, export to ONNX → TFLite and quantize.
-  * Keep sampling & upload schedule light (periodic batch upload) and use on-device logging as fallback.
-
----
-
-# Project structure
-
-```
-time_series_models/
-├── README.md
-├── requirements.txt
-├── config.py
-├── data/
-│   ├── loaders.py
-│   └── features.py
-├── datasets.py
-├── models/
-│   └── seq_model.py
-├── trainers/
-│   ├── seq_trainer.py
-│   ├── xgb_trainer.py
-│   └── arima_trainer.py
-├── utils.py
-├── run_all.py
-└── cli.py
-```
-
----
-
-# Future work / extensions
-
-* Multi-step seq2seq forecasting (direct 3–7 day vector outputs).
-* Add anomaly detection (Isolation Forest / Autoencoder) for sensor faults.
-* Quantile/uncertainty predictions and calibration.
-* Automated retraining pipeline with data drift detection.
-* Model export scripts for ONNX/TFLite and example microcontroller inference code.
-* Dashboard with live data, prediction overlays, and alert management.
-
----
-
-# License & acknowledgements
-
-This README and the accompanying code are provided without warranty. Feel free to adapt the code for research or educational use. If you want, I can add a specific license file (MIT, Apache 2.0, etc.).
-
----
-
-# Contact
-
-If you want the README adapted to a formal project report, or want me to:
-
-* Add ready-made notebooks that visualize results,
-* Add a `train_config.yaml` and extend `cli.py` to run individual model training with hyperparameters,
-* Produce ONNX/TFLite export and minimal inference examples for ESP32/STM32,
-
-tell me which and I’ll generate the files next.
